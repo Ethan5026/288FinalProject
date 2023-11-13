@@ -8,6 +8,8 @@
  *      Author: ethgru
  */
 
+int left_calibration = 282517;
+int right_calibration = 310876;
 void pwm_init(){
     SYSCTL_RCGCGPIO_R |= 0x2; // set clock for port b
     SYSCTL_RCGCTIMER_R |= 0x2; // enable timer1 clock
