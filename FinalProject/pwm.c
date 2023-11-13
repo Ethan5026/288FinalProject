@@ -1,5 +1,4 @@
 #include <pwm.h>
-#include "REF_tm4c123gh6pm.h"
 #include "button.h"
 #include "lcd.h"
 /*
@@ -28,6 +27,9 @@ void pwm_init(){
     TIMER1_TBMATCHR_R = 0xE200; //set the periodish
     TIMER1_TBMR_R |= 0xA; //periodic, pwm, count-down, match update
     TIMER1_CTL_R |= 0x100; // enable timer and pwm
+
+    leftCalibration = 282517;
+    rightCalibration = 310876;
 }
 
 void pwm_setMATCH(int input){
