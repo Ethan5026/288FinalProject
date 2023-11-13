@@ -8,8 +8,6 @@
  *      Author: ethgru
  */
 
-leftCalibration = 282517;
-rightCalibration = 310876;
 void pwm_init(){
     SYSCTL_RCGCGPIO_R |= 0x2; // set clock for port b
     SYSCTL_RCGCTIMER_R |= 0x2; // enable timer1 clock
@@ -29,6 +27,9 @@ void pwm_init(){
     TIMER1_TBMATCHR_R = 0xE200; //set the periodish
     TIMER1_TBMR_R |= 0xA; //periodic, pwm, count-down, match update
     TIMER1_CTL_R |= 0x100; // enable timer and pwm
+
+    leftCalibration = 282517;
+    rightCalibration = 310876;
 }
 
 void pwm_setMATCH(int input){
