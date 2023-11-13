@@ -37,42 +37,6 @@ void pwm_setMATCH(int input){
     TIMER1_TBPMR_R = (input >> 16) & 0xFF;
 }
 
-void pwm_config(){
-    lcd_init();
-    button_init();
-    int matchValue = 298238;
-    lcd_printf("Press Buttons 1 and 2 to\nposition at 0 degrees\nPress 4 to enter");
-    while(button_getButton() != 4){
-        if(button_getButton() == 2){
-            matchValue++;
-        }
-        else if(button_getButton() == 1){
-            matchValue--;
-        }
-        pwm_setMATCH(matchValue);
-        timer_waitMicros(200);
-
-    }
-    while(button_getButton() == 4){}
-    timer_waitMillis(20);
-    rightCalibration = matchValue;
-
-    lcd_printf("Press Buttons 1 and 2 to\nposition at 180 degrees\nPress 4 to enter");
-    while(button_getButton() != 4){
-        if(button_getButton() == 2){
-            matchValue++;
-        }
-        else if(button_getButton() == 1){
-            matchValue--;
-        }
-        pwm_setMATCH(matchValue);
-        timer_waitMicros(200);
-
-    }
-    leftCalibration = matchValue;
-    lcd_printf("Right: %d\nLeft: %d", rightCalibration, leftCalibration);
-}
-
 void pwm_setAngle(int degree){
     if(degree > 180 || degree < 0){
         return;

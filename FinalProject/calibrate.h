@@ -19,5 +19,7 @@ double calibrate_driveDistance(oi_t *sensor);
 //Calculate the coefficient that needs to be multiplied by the timer values to get an accurate distance
 double calibrate_ping();
 
+//Find the upper and lower bounds for the pwm
+void calibrate_pwm()
 
 #endif /* CALIBRATE_H_ */
