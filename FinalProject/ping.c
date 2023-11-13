@@ -36,7 +36,7 @@ void ping_init(){
     IntMasterEnable();
     TIMER3_CTL_R |= 0x0100; // enable the timer
     overflow = 0;
-    ping_coef = 1;
+    ping_coef = .00108;
 }
 void TIMER3B_Handler(){
     int time = TIMER3_TBR_R;
