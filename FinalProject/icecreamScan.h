@@ -19,8 +19,8 @@ typedef struct objectStruct{
     //calculated width of the object
     double width;
 
-    //1 if its the last object found
-    int isLastObject;
+    //1 if this truly is an object found
+    int isObject;
 }obj_t;
 
 //Initializes the ping, ir, and pwm

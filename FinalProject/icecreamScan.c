@@ -1,3 +1,10 @@
+/*
+ * icecreamScan.c
+ *
+ *  Created on: Nov 13, 2023
+ *      Author: idenning
+ */
+
 #include "icecreamScan.h"
 #include "movement.h"
 #include "pwm.h"
@@ -9,7 +16,7 @@
 #include<math.h>
 
 typedef struct scan_struct{
-    float sound_dist;
+    double sound_dist;
     int IR_raw_val;
 } Scan_t;
 
@@ -45,7 +52,7 @@ void icecreamScan_scan(obj_t objects[], int startAngle, int endAngle) {
 
     int angle = 0;
     double last_distance = 0;
-    for(angle = 0; angle <= 180; angle+=2) {
+    for(angle = startAngle; angle <= endAngle; angle+=2) {
         pwm_setAngle(angle);
         timer_waitMillis(200);
         capture(angle, &scanData);
@@ -70,6 +77,8 @@ void icecreamScan_scan(obj_t objects[], int startAngle, int endAngle) {
         }
         last_distance = linearIR;
     }
+
+    objects[objIndex].isObject = 0;
 }
 
 obj_t completeObject(partial_obj_t obj) {
@@ -80,8 +89,8 @@ obj_t completeObject(partial_obj_t obj) {
     timer_waitMillis(1000);
     capture(result.angle, &scanData);
     result.distance = scanData.sound_dist;
-    double width = 2 * result.distance * sin((obj.end_angle - obj.start_angle) * (M_PI / 180)/2);
-
+    result.width = 2 * result.distance * sin((obj.end_angle - obj.start_angle) * (M_PI / 180)/2);
+    result.isObject = 1;
 
     return result;
 }
