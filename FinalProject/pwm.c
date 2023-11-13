@@ -1,5 +1,4 @@
 #include <pwm.h>
-#include "REF_tm4c123gh6pm.h"
 #include "button.h"
 #include "lcd.h"
 /*
