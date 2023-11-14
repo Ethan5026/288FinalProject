@@ -37,10 +37,10 @@ void icecreamScan_init() {
     ping_init();
     IR_init();
 }
-double MINIMUM_EDGE_CHANGE = 10  ;
-double MAXIMUM_CUSTOMER_DISTANCE = 50;
-double MAX_OBJECT_WIDTH = 120;
-double MIN_OBJECT_WIDTH = 80;
+double MINIMUM_EDGE_CHANGE = 4;
+double MAXIMUM_CUSTOMER_DISTANCE = 35;
+double MAX_OBJECT_WIDTH = 100;
+double MIN_OBJECT_WIDTH = 50;
 
 
 //Still needs to work with the IR calibrated values and dist_coef
@@ -82,14 +82,14 @@ drive_t icecreamScan_drive(oi_t *sensor, int centimeters, int unfinishedWidth){
     pwm_setAngle(0);
 
     //set the wheels to move slowly
-    oi_setWheels(50, 50);
+    oi_setWheels(200, 200);
 
     //while the distance traveled is lower than distance given
     while(fabs(distanceTracker) < fabs(centimeters * 10 * distance_coef)){
 
         //get the current IR value and compare if object has start
         irCurrent = 248063.4636 * pow((double)IR_receive(), -1.3058990322);
-        if((fabs(irCurrent - irPrevious) > MINIMUM_EDGE_CHANGE) && objectStarted == 0){
+        if((fabs(irCurrent - irPrevious) > MINIMUM_EDGE_CHANGE) && irCurrent < MAXIMUM_CUSTOMER_DISTANCE && objectStarted == 0){
 
             //start the object scanning
             objectStarted = 1;
@@ -157,6 +157,7 @@ drive_t icecreamScan_drive(oi_t *sensor, int centimeters, int unfinishedWidth){
     returnVal.distanceTraveled = centimeters * 10;
     return returnVal;
 }
+
 void icecreamScan_scan(obj_t objects[], int startAngle, int endAngle) {
     Scan_t scanData;
     int objIndex = 0;
