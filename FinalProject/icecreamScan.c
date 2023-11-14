@@ -14,6 +14,7 @@
 #include "uart.h"
 #include<limits.h>
 #include<math.h>
+#include "open_interface.h"
 
 typedef struct scan_struct{
     double sound_dist;
@@ -36,7 +37,126 @@ void icecreamScan_init() {
     ping_init();
     IR_init();
 }
+double MINIMUM_EDGE_CHANGE = 10  ;
+double MAXIMUM_CUSTOMER_DISTANCE = 50;
+double MAX_OBJECT_WIDTH = 120;
+double MIN_OBJECT_WIDTH = 80;
 
+
+//Still needs to work with the IR calibrated values and dist_coef
+drive_t icecreamScan_drive(oi_t *sensor, int centimeters, int unfinishedWidth){
+
+    //will be removed after implementation
+    double distance_coef = 1;
+
+    // is 1 if an object is in the middle of a scan
+    int objectStarted = (unfinishedWidth != 0);
+
+    //total distance traveled
+    double distanceTracker = 0;
+
+    //previous IR value
+    double irPrevious = 248063.4636 * pow((double)IR_receive(), -1.3058990322);
+
+    //current IR value
+    double irCurrent;
+
+    //starting width of the object
+    double objectStartDistance;
+
+    //total width of the object
+    double objectTotalDistance;
+
+    drive_t returnVal;
+
+    char message[20];
+
+    //can't allow centimeters to be negative, illegal argument
+    if(centimeters < 0){
+        returnVal.exitCode = 0;
+        returnVal.distanceTraveled = 0;
+        return returnVal;
+    }
+
+    //set the angle to 0
+    pwm_setAngle(0);
+
+    //set the wheels to move slowly
+    oi_setWheels(50, 50);
+
+    //while the distance traveled is lower than distance given
+    while(fabs(distanceTracker) < fabs(centimeters * 10 * distance_coef)){
+
+        //get the current IR value and compare if object has start
+        irCurrent = 248063.4636 * pow((double)IR_receive(), -1.3058990322);
+        if((fabs(irCurrent - irPrevious) > MINIMUM_EDGE_CHANGE) && objectStarted == 0){
+
+            //start the object scanning
+            objectStarted = 1;
+            objectStartDistance = distanceTracker / distance_coef;
+            objectTotalDistance = distanceTracker / distance_coef;
+        }
+
+        else if((fabs(irCurrent - irPrevious) < MINIMUM_EDGE_CHANGE) && objectStarted == 1){
+
+            //update the object's scan data
+            objectTotalDistance = distanceTracker / distance_coef;
+        }
+
+        else if((fabs(irCurrent - irPrevious) > MINIMUM_EDGE_CHANGE) && objectStarted == 1){
+
+            //calculate final data
+
+            //if width is around 5cm, which represents a skinny object, and is close to the curb then it stops
+            if(((objectTotalDistance - objectStartDistance + unfinishedWidth) < MAX_OBJECT_WIDTH) &&((objectTotalDistance - objectStartDistance + unfinishedWidth) > MIN_OBJECT_WIDTH)){
+                //customer found
+                oi_setWheels(0,0);
+
+                returnVal.exitCode = 4;
+                returnVal.distanceTraveled = distanceTracker / distance_coef;
+
+                return returnVal;
+            }
+            else{
+                objectStarted = 0;
+                objectStartDistance = 0;
+                objectTotalDistance = 0;
+
+            }
+        }
+        sprintf(message, "%.2lf,   %.2lf,  %d \n\r", irCurrent, distanceTracker / distance_coef, objectStarted);
+        uart_sendStr(message);
+        //check if anything is being hit or holes
+        if(sensor->bumpLeft){
+            oi_setWheels(0,0);
+            returnVal.exitCode = 2;
+            returnVal.distanceTraveled = distanceTracker / distance_coef;
+            return returnVal;
+        }
+        else if(sensor->bumpRight){
+            oi_setWheels(0,0);
+            returnVal.exitCode = 1;
+            returnVal.distanceTraveled = distanceTracker / distance_coef;
+            return returnVal;
+        }
+        else if(sensor->cliffLeft || sensor->cliffRight){
+            oi_setWheels(0,0);
+                        returnVal.exitCode = 3;
+                        returnVal.distanceTraveled = distanceTracker / distance_coef;
+                        return returnVal;
+        }
+
+        //update the distance values
+        oi_update(sensor);
+        distanceTracker += sensor->distance;
+        irPrevious = irCurrent;
+
+    }
+    oi_setWheels(0,0);
+    returnVal.exitCode = 0;
+    returnVal.distanceTraveled = centimeters * 10;
+    return returnVal;
+}
 void icecreamScan_scan(obj_t objects[], int startAngle, int endAngle) {
     Scan_t scanData;
     int objIndex = 0;
