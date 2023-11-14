@@ -61,9 +61,6 @@ drive_t icecreamScan_drive(oi_t *sensor, int centimeters, int unfinishedWidth){
     //current IR value
     double irCurrent;
 
-    //current ping Value
-    double pingCurrent;
-
     //starting width of the object
     double objectStartDistance;
 
@@ -122,7 +119,6 @@ drive_t icecreamScan_drive(oi_t *sensor, int centimeters, int unfinishedWidth){
             }
             else{
                 objectStarted = 0;
-                pingDistance = 0;
                 objectStartDistance = 0;
                 objectTotalDistance = 0;
 
