@@ -23,7 +23,6 @@ user_cart = {
         "chocolate" : 0,
         "vanilla" : 0,
         "strawberry" : 0,
-        "neopolitan" : 0
 }
 
 def add_choc():
@@ -36,10 +35,6 @@ def add_van():
 
 def add_straw():
         user_cart["strawberry"] += 1
-        show_cart()
-
-def add_neo():
-        user_cart["neopolitan"] += 1
         show_cart()
 
 def show_cart():
@@ -74,10 +69,6 @@ def main():
         # Add Strawberry
         add_straw_Button = tk.Button(text = "Add strawberry", command = add_straw)
         add_straw_Button.grid(row = 7)
-
-        # Add Neopolitan
-        add_neo_Button = tk.Button(text = "Add neopolitan", command = add_neo)
-        add_neo_Button.grid(row = 8)
 
         # Submit
         submit_Button = tk.Button(text = "Submit", command = show_cart)
@@ -188,7 +179,26 @@ def socket_thread():
                 else:                
                         print("Waiting for server reply\n")
                         rx_message = cybot.readline()      # Wait for a message, readline expects message to end with "\n"
-                        print("Got a message from server: " + rx_message.decode() + "\n") # Convert message from bytes to String (i.e., decode)
+                        dec_rx = rx_message.decode()
+                        while (1):
+                                dec_rx = dec_rx[:len(dec_rx) - 1]
+                                print("Got a message from server: " + dec_rx) # Convert message from bytes to String (i.e., decode)
+                                command_display = dec_rx
+                                print(dec_rx)
+                                if (dec_rx == '1'):
+                                        add_choc()
+                                elif (dec_rx == '2'):
+                                        add_van()
+                                elif (dec_rx == '3'):
+                                        add_straw()
+                                elif (dec_rx == '4'):
+                                        break
+                                dec_rx = cybot.readline().decode()
+                        print("End of order")
+                        
+
+                        
+                                
 
 
                 # Choose either: 1) Idle wait, or 2) Request a periodic status update from the Cybot
