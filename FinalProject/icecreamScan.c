@@ -73,7 +73,7 @@ drive_t icecreamScan_drive(oi_t *sensor, int centimeters, int unfinishedWidth){
 
     //can't allow centimeters to be negative, illegal argument
     if(centimeters < 0){
-        returnVal.exitCode = 0;
+        returnVal.exitCode = 5;
         returnVal.distanceTraveled = 0;
         return returnVal;
     }
