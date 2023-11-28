@@ -32,7 +32,7 @@ void calibrate_IR(oi_t *sensor){
 }
 void calibrate_driveDistance(oi_t *sensor){
     distance_coef = 1;
-    move(sensor, 100);
+    drive(sensor, 100);
     lcd_printf("100/ActCM = distOff");
 }
 
