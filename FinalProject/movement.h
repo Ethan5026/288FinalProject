@@ -29,10 +29,23 @@ typedef struct drivingStruct{
  */
 drive_t drive(oi_t *sensor, int centimeters);
 
+void move_init();
 /*
  * Will turn the cyBot a certain degree with using an error coefficient value
  * Clockwise is a positive value, Counterclockwise is a negative value
  */
 void turn(oi_t *sensor, int degrees);
 
+void move_forward(oi_t *sensor, int centimeters);
+void move_dynamic(oi_t *sensor, int centimeters);
+
+void turn_clockwise(oi_t *sensor, int degrees);
+
+void turn_counterclockwise(oi_t *sensor, int degrees);
+
+void move_backward(oi_t *sensor, int centimeters);
+
+void turn(oi_t *sensor, int degrees);
+
+void move(oi_t *sensor, int centimeters);
 #endif /* MOVEMENT_H_ */
