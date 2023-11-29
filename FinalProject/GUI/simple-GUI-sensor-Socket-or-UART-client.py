@@ -19,31 +19,25 @@ import os  # import function for finding absolute path to this python script
 
 ##### START Define Functions  #########
 
-
-
 # Main: Mostly used for setting up, and starting the GUI
 def main():
 
-
         global window  # Made global so quit function (send_quit) can access
         window = tk.Tk() # Create a Tk GUI Window
-        window.title("Purchase Ice Cream")
-
-        # Submit
-        submit_Button = tk.Button(text = "Submit", command = show_cart)
 
         # Last command label  
         global Last_command_Label  # Made global so that Client function (socket_thread) can modify
-        Last_command_Label = tk.Label(text="Last Command Sent: ") # Create a Label
-        Last_command_Label.grid(row=13) # Pack the label into the window for display
+        Last_command_Label = tk.Label(text="Last Command Sent: ") # Creat a Label
+        Last_command_Label.pack() # Pack the label into the window for display
 
         # Quit command Button
         quit_command_Button = tk.Button(text ="Press to Quit", command = send_quit)
-        quit_command_Button.grid(row=16)  # Pack the button into the window for display
+        quit_command_Button.pack()  # Pack the button into the window for display
 
         # Cybot Scan command Button
         scan_command_Button = tk.Button(text ="Press to Scan", command = send_scan)
-        scan_command_Button.grid(row=14) # Pack the button into the window for display
+        scan_command_Button.pack() # Pack the button into the window for display
+
 
         # Create a Thread that will run a fuction assocated with a user defined "target" function.
         # In this case, the target function is the Client socket code
@@ -52,9 +46,6 @@ def main():
 
         # Start event loop so the GUI can detect events such as button clicks, key presses, etc.
         window.mainloop()
-
-       
-
 
 
 # Quit Button action.  Tells the client to send a Quit request to the Cybot, and exit the GUI
@@ -70,7 +61,6 @@ def send_quit():
 # Scan Button action.  Tells the client to send a scan request to the Cybot
 def send_scan():
         global gui_send_message # Command that the GUI has requested sent to the Cybot
-
         
         gui_send_message = "M\n"   # Update the message for the Client to send
 
@@ -106,8 +96,6 @@ def socket_thread():
         # Send some text: Either 1) Choose "Hello" or 2) have the user enter text to send
         # send_message = "Hello\n"                            # 1) Hard code message to "Hello", or
         send_message = input("Enter a message:") + '\n'   # 2) Have user enter text
-        # send_message = cybot.readline() + '\n'
-        # print(send_message.encode())
         gui_send_message = "wait\n"  # Initialize GUI command message to wait                                
 
         cybot.write(send_message.encode()) # Convert String to bytes (i.e., encode), and send data to the server
@@ -138,42 +126,10 @@ def socket_thread():
                         file_object.close() # Important to close file once you are done with it!!                
 
                 else:                
-                        # test value for order
-                        order = 'c4'
+                        print("Waiting for server reply\n")
+                        rx_message = cybot.readline()      # Wait for a message, readline expects message to end with "\n"
+                        print("Got a message from server: " + rx_message.decode() + "\n") # Convert message from bytes to String (i.e., decode)
 
-                        while order != 'x0': # x0 means that current order ends
-                                print("Waiting for server reply\n")
-
-                                # start = cybot.readline().decode()     # Wait for a message, readline expects message to end with "\n"
-                                # start = start[1:len(start) - 1]
-                                start = 'g'
-
-                                print("Got a message from server: " + start) # Convert message from bytes to String (i.e., decode)
-
-                                # cybot.readline() # skip dumb stupid unicode arrow thing
-
-                                # order = cybot.readline().decode()
-                                # order = order[:len(order) - 1]
-                                # order = 'c4'
-
-
-                                print("order: " + order)
-                                flavor = order[:1]
-                                print("flavor: " + flavor)
-                                qty = order[1:].strip()
-                                print("quantity: " + qty + '\n')
-                                add_item(flavor, qty)
-                                order = input("Enter order: ") # for testing
-
-                                # while (1):
-                                #         order = cybot.readline().decode()
-                                #         print(order)
-                                #         flavor = order[:1]
-                                #         qty = order[1:].strip()
-                                #         add_item(flavor, qty)
-                        print("End of order")
-                        reset_cart()
-                        
 
                 # Choose either: 1) Idle wait, or 2) Request a periodic status update from the Cybot
                 # 1) Idle wait: for gui_send_message to be updated by the GUI
@@ -200,62 +156,6 @@ def socket_thread():
 
 ##### END Define Functions  #########
 
-user_cart = {
-        "chocolate" : 0,
-        "vanilla" : 0,
-        "mint" : 0,
-        "tea" : 0
-}
-
-total_sold = {
-        "chocolate" : 0,
-        "vanilla" : 0,
-        "mint" : 0,
-        "tea" : 0
-}
-
-
-
-def show_cart(qty):
-        print("updating cart...")
-        order_str = "Cart: \n"
-        global total
-        total = 0
-        for key, val in user_cart.items():
-                order_str += str(key + ": " + str(val) + '\n')
-                if key == 'tea':
-                        total += (user_cart["tea"] * 3.50)
-                elif key == 'vanilla':
-                        total += (user_cart["vanilla"] * 2.00)
-                elif key == 'chocolate':
-                        total += (user_cart["chocolate"] * 2.00)
-                elif key == 'mint':
-                        total += (user_cart["mint"] * 2.00)
-        order_str += "Total: $" + str(total)
-        cart_items = tk.Label(window, text="")
-        cart_items.grid(row=10)
-        cart_items.config(text=order_str)
-
-def add_item(f, q):
-        print("adding item...")
-        q = int(q)
-        if (f == 'c'):
-                user_cart["chocolate"] += q
-                total_sold["chocolate"] += q
-        elif (f == 'v'):
-                user_cart["vanilla"] += q
-                total_sold["vanilla"] += q
-        elif (f == 'm'):
-                user_cart["mint"] += q
-                total_sold["mint"] += q
-        elif (f == 't'):
-                user_cart["tea"] += q
-                total_sold["tea"] += q
-        show_cart(q)
-
-def reset_cart():
-        for v in user_cart.values():
-                v = 0
 
 ### Run main ###
 main()
