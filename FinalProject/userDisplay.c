@@ -118,8 +118,8 @@ void userDisplay_sell() {
 
     while (userChoice == 0) { // while nothing is being pressed, wait for input
       userChoice = button_getButton();
-      // timer_waitMillis(1);
-      // timeout++;
+      timer_waitMillis(1);
+      timeout++;
       if (timeout > 15000) {lcd_clear();return;}
     }
 
