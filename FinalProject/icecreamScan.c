@@ -141,9 +141,9 @@ drive_t icecreamScan_drive(oi_t *sensor, int centimeters, int unfinishedWidth){
         }
         else if(sensor->cliffLeft || sensor->cliffRight){
             oi_setWheels(0,0);
-                        returnVal.exitCode = 3;
-                        returnVal.distanceTraveled = distanceTracker / distance_coef;
-                        return returnVal;
+            returnVal.exitCode = 3;
+            returnVal.distanceTraveled = distanceTracker / distance_coef;
+            return returnVal;
         }
 
         //update the distance values
